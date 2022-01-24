@@ -19,8 +19,14 @@
     "indent": "error",
     "no-console": "warn",
     "space-before-function-paren": "off",
-    "prettier/prettier": "error"
-
-
+    "prettier/prettier": "error",
+    "arrow-body-style": "off",
+    "react/function-component-definition": [
+      2,
+      {
+        "namedComponents": "arrow-function",
+        "unnamedComponents": "arrow-function"
+      }
+    ]
   }
 }
