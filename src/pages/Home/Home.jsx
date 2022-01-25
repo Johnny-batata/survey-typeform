@@ -1,6 +1,7 @@
 import React from "react";
 
 import Button from "@mui/material/Button";
+import { Link } from "react-router-dom";
 import * as S from "./styles";
 
 const Home = () => {
@@ -25,13 +26,18 @@ const Home = () => {
             transparência
           </p>
         </S.ContentDiv>
-        <Button
-          variant="contained"
-          sx={{ "margin-top": "40px", backgroundColor: "#0067ac" }}
-          size="large"
-        >
-          Começar
-        </Button>
+        <Link to="/form">
+          <Button
+            variant="contained"
+            sx={{
+              "margin-top": "40px",
+              backgroundColor: "#0067ac",
+            }}
+            size="large"
+          >
+            Começar
+          </Button>
+        </Link>
       </S.Wrapper>
     </S.Main>
   );

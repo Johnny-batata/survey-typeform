@@ -5,6 +5,10 @@ export const Main = styled.main`
   width: 100%;
   height: 100%;
   background-color: #4282a5;
+
+  a {
+    text-decoration: none;
+  }
 `;
 
 export const Img = styled.img`
