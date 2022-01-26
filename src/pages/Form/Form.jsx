@@ -29,7 +29,6 @@ const Form = () => {
         <S.Question>{questions[currentQuestion].question}</S.Question>
         {handleComponents()}
         <ButtonsNav />
-        {/* {renderNavButtons()} */}
       </S.Wrapper>
     </S.Main>
   );

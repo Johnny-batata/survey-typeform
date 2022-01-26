@@ -4,10 +4,31 @@ import Button from "@mui/material/Button";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ButtonGroup from "@mui/material/ButtonGroup";
+import { useNavigate } from "react-router-dom";
 import Context from "../../../../Provider/Context";
 
 const ButtonsNav = () => {
-  const { value } = useContext(Context);
+  const {
+    value,
+    setCurrentQuestion,
+    currentQuestion,
+    setAnswers,
+    questions,
+    answers,
+  } = useContext(Context);
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    const { id } = questions[currentQuestion];
+
+    if (currentQuestion + 1 >= questions.length) {
+      return navigate("/form/result");
+    }
+    setCurrentQuestion(currentQuestion + 1);
+    const curr = { id, value };
+    return setAnswers([...answers, curr]);
+  };
+
   const renderNavButtons = () => {
     return (
       <ButtonGroup
@@ -39,6 +60,7 @@ const ButtonsNav = () => {
           }}
           size="large"
           disabled={!value}
+          onClick={handleClick}
         >
           <ArrowForwardIcon />
         </Button>
