@@ -5,7 +5,10 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import { useNavigate } from "react-router-dom";
+import { ref, push } from "firebase/database";
+import dateformat from "dateformat";
 import Context from "../../../../Provider/Context";
+import db from "../../../../utils/firebase";
 
 const ButtonsNav = () => {
   const {
@@ -18,15 +21,37 @@ const ButtonsNav = () => {
   } = useContext(Context);
   const navigate = useNavigate();
 
-  const handleClick = () => {
+  const sendAnswers = (curr) => {
+    try {
+      const now = new Date();
+      const date = dateformat(now, "dd/MM/yyyy");
+
+      const result = [];
+      answers.forEach((el) => result.push(el));
+      result.push(curr);
+
+      const docRef = push(ref(db, "questions/"), {
+        date,
+        answers: result,
+      });
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.log("Error adding document: ", e);
+    }
+    // });
+  };
+
+  const handleClick = async () => {
     const { id } = questions[currentQuestion];
+    const curr = { id, value };
+    setAnswers([...answers, curr]);
 
     if (currentQuestion + 1 >= questions.length) {
+      sendAnswers(curr);
       return navigate("/form/result");
     }
-    setCurrentQuestion(currentQuestion + 1);
-    const curr = { id, value };
-    return setAnswers([...answers, curr]);
+
+    return setCurrentQuestion(currentQuestion + 1);
   };
 
   const renderNavButtons = () => {
@@ -44,7 +69,7 @@ const ButtonsNav = () => {
         <Button
           variant="contained"
           sx={{
-            "margin-top": "40px",
+            marginTop: "40px",
             backgroundColor: "#0067ac",
           }}
           size="large"
@@ -55,7 +80,7 @@ const ButtonsNav = () => {
         <Button
           variant="contained"
           sx={{
-            "margin-top": "40px",
+            marginTop: "40px",
             backgroundColor: "#0067ac",
           }}
           size="large"
