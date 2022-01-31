@@ -9,6 +9,7 @@ import { ResponsivePie } from "@nivo/pie";
 const MyResponsivePie = ({ data /* see data tab */ }) => {
   return (
     <ResponsivePie
+      style={{ overflow: "hidden" }}
       data={data}
       margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
       innerRadius={0.2}

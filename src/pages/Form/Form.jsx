@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import Context from "../../Provider/Context";
 
 import RatingBar from "./component/RatingBar/RatingBar";
@@ -9,8 +9,17 @@ import Header from "../GeneralComponents/Header/Header";
 import * as S from "./styles";
 
 const Form = () => {
-  const { questions, handleChange, value, setValue, currentQuestion } =
-    useContext(Context);
+  const {
+    questions,
+    handleChange,
+    value,
+    setValue,
+    currentQuestion,
+    setAnswers,
+  } = useContext(Context);
+  useEffect(() => {
+    setAnswers([]);
+  }, []);
 
   const handleComponents = () => {
     const { type, options } = questions[currentQuestion];

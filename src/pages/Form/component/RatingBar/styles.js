@@ -8,6 +8,9 @@ export const RatingDiv = styled.div`
   border: 1px solid #000;
   box-sizing: border-box;
   background: linear-gradient(to right, #f00, #ff0, #0f0);
+  @media (max-width: 594px) {
+    width: 100%;
+  }
 
   input {
     display: none;

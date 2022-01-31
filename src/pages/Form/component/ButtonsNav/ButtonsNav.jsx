@@ -65,18 +65,28 @@ const ButtonsNav = () => {
 
     return setCurrentQuestion(currentQuestion + 1);
   };
+  const formProps = {
+    width: "100%",
+    display: "flex",
+    justifyContent: "flex-end",
+    boxShadow: "none",
+    // paddingBottom: 40,
+  };
+
+  const resultProps = {
+    width: "100%",
+    justifyContent: "center",
+    display: "flex",
+    boxShadow: "none",
+    paddingBottom: "21.440px",
+  };
 
   const renderNavButtons = () => {
     return (
       <ButtonGroup
         variant="contained"
         aria-label="outlined primary button group"
-        sx={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "flex-end",
-          boxShadow: "none",
-        }}
+        sx={!checkLocation ? formProps : resultProps}
       >
         <Button
           variant="contained"

@@ -3,18 +3,19 @@
 /* eslint-disable no-param-reassign */
 import React, { useEffect, useState, useContext } from "react";
 import { ref, get, child } from "firebase/database";
+import CircularProgress from "@mui/material/CircularProgress";
 import MyResponsivePie from "./component/PieGraph/PieGraph";
 import Header from "../GeneralComponents/Header/Header";
 import MyResponsiveBar from "./component/BarGraph/BarGraph";
 import apiData from "../../data";
 import Context from "../../Provider/Context";
 import ButtonsNav from "../Form/component/ButtonsNav/ButtonsNav";
+import * as S from "./styles";
 
 import db from "../../utils/firebase";
 
 const Graph = () => {
   const [allAnswers, setAllAnswers] = useState([]);
-  // const [currentGraph, setCurrentGraph] = useState(1);
   const { setCurrentQuestion, currentQuestion } = useContext(Context);
 
   const GroupAnswers = (items) => {
@@ -131,16 +132,24 @@ const Graph = () => {
         );
       }
     }
-    return false;
+    return (
+      <S.LoadingDiv>
+        <CircularProgress
+          disableShrink
+          size={200}
+          style={{ display: "flex", justifyContent: "center" }}
+        />
+      </S.LoadingDiv>
+    );
   };
   return (
-    <div style={{ height: "400px" }}>
+    <div>
       <Header />
-      <h1 style={{ display: "flex", justifyContent: "center" }}>
-        {apiData[currentQuestion].question}
-      </h1>
-      {checkLoading()}
-      <ButtonsNav />
+      <main style={{ height: "600px" }}>
+        <S.Title>{apiData[currentQuestion].question}</S.Title>
+        {checkLoading()}
+        <ButtonsNav />
+      </main>
     </div>
   );
 };
