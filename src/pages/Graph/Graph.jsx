@@ -17,77 +17,86 @@ import db from "../../utils/firebase";
 const Graph = () => {
   const [allAnswers, setAllAnswers] = useState([]);
   const { setCurrentQuestion, currentQuestion } = useContext(Context);
+  const data = [];
+
+  const checkDuplicateQuestion = (el) => data.findIndex((item) => item[el.id]);
+
+  const checkDuplicateAswr = (arr, el, repeatedOptionsQuestionIDIndex) =>
+    arr[repeatedOptionsQuestionIDIndex][el.id].findIndex(
+      (itemI) => itemI.id === el.value
+    );
+  const createAnswerObject = (el) => {
+    return {
+      id: el.value,
+      label: el.value,
+      color: "hsl(25, 70%, 50%)",
+      value: 1,
+      question: el.id,
+    };
+  };
+
+  const handleTypeOptionsAnswers = (el) => {
+    // this function group questions by options type
+
+    const checkQuestion = checkDuplicateQuestion(el);
+
+    const arr = createAnswerObject(el);
+    if (checkQuestion >= 0) {
+      // this if check question id existence, if's not then create a new one
+
+      const elementIndex = checkDuplicateAswr(data, el, checkQuestion);
+
+      if (elementIndex >= 0) {
+        // this if checks if that answer already exists, if already exists then increases value on one
+        return (data[checkQuestion][el.id][elementIndex].value += 1);
+      }
+      // if that answer doesn't exist it's created bellow
+      return data[checkQuestion][el.id].push(arr);
+    }
+    // if the question id doesn't exist its create bellow
+    return data.push({ [el.id]: [arr] });
+  };
+
+  const handleTypeRating = (el) => {
+    // this function group questions by rating type
+    const arr = createAnswerObject(el);
+
+    const checkQuestion = checkDuplicateQuestion(el);
+    if (checkQuestion >= 0) {
+      // this if check question id existence, if's not then create a new one
+
+      const elementIndex = checkDuplicateAswr(data, el, checkQuestion);
+
+      if (elementIndex >= 0) {
+        // this if checks if that answer already exists, if already exists then increases value on one
+
+        data[checkQuestion][el.id][elementIndex][el.value] += 1;
+        return (data[checkQuestion][el.id][elementIndex].value += 1);
+      }
+      // if that answer doesn't exist it's created bellow
+      return data[checkQuestion][el.id].push({
+        [el.value]: 1,
+        ...arr,
+      });
+    }
+
+    return data.push({ [el.id]: [{ [el.value]: 1, ...arr }] });
+  };
 
   const GroupAnswers = (items) => {
-    // this functions get all answers from db by params and group them by question(using it's id) then remove duplicates adding object's value that's supose to be duplicated on one
-    const data = [];
+    // this functions get all answers from db by params and verify what question type is
     items
       .map(({ answers }) => answers)
       .forEach((e) =>
         e.forEach((el) => {
-          const arr = {
-            id: el.value,
-            label: el.value,
-            color: "hsl(25, 70%, 50%)",
-            value: 1,
-            question: el.id,
-          };
           const questionIndex = apiData.findIndex(
             (question) => question.id === el.id
           );
-          const repeatedOptionsQuestionIDIndex = data.findIndex(
-            (item) => item[el.id]
-          );
 
           if (apiData[questionIndex].type === "options") {
-            if (repeatedOptionsQuestionIDIndex >= 0) {
-              // this if check question id existence, if's not then create a new one
-              const elementIndex = data[repeatedOptionsQuestionIDIndex][
-                el.id
-              ].findIndex((itemI) => itemI.id === el.value);
-
-              if (elementIndex >= 0) {
-                // this if checks if that answer already exists, if already exists then increases value on one
-                return (data[repeatedOptionsQuestionIDIndex][el.id][
-                  elementIndex
-                ].value += 1);
-              }
-              // if that answer doesn't exist it's created bellow
-              return data[repeatedOptionsQuestionIDIndex][el.id].push(arr);
-            }
-            // if the question id doesn't exist its create bellow
-            return data.push({ [el.id]: [arr] });
+            return handleTypeOptionsAnswers(el);
           }
-
-          const repeatedRatingQuestionIDIndex = data.findIndex((item) => {
-            return item[el.id];
-          });
-          if (repeatedRatingQuestionIDIndex >= 0) {
-            // this if check question id existence, if's not then create a new one
-
-            const elementIndex = data[repeatedOptionsQuestionIDIndex][
-              el.id
-            ].findIndex((itemI) => {
-              return itemI.id === el.value;
-            });
-            if (elementIndex >= 0) {
-              // this if checks if that answer already exists, if already exists then increases value on one
-
-              data[repeatedOptionsQuestionIDIndex][el.id][elementIndex][
-                el.value
-              ] += 1;
-              return (data[repeatedOptionsQuestionIDIndex][el.id][
-                elementIndex
-              ].value += 1);
-            }
-            // if that answer doesn't exist it's created bellow
-            return data[repeatedOptionsQuestionIDIndex][el.id].push({
-              [el.value]: 1,
-              ...arr,
-            });
-          }
-
-          return data.push({ [el.id]: [{ [el.value]: 1, ...arr }] });
+          return handleTypeRating(el);
         })
       );
     setAllAnswers(data);
