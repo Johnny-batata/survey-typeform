@@ -26,18 +26,19 @@ const Home = () => {
             transparência
           </p>
         </S.ContentDiv>
-        <Link to="/form">
-          <Button
-            variant="contained"
-            sx={{
-              "margin-top": "40px",
-              backgroundColor: "#0067ac",
-            }}
-            size="large"
-          >
-            Começar
-          </Button>
-        </Link>
+        <S.ButtonDiv>
+          <Link to="/form">
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "#0067ac",
+              }}
+              size="large"
+            >
+              Começar
+            </Button>
+          </Link>
+        </S.ButtonDiv>
       </S.Wrapper>
     </S.Main>
   );

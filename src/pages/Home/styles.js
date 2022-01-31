@@ -1,16 +1,5 @@
 import styled from "styled-components";
 
-export const Main = styled.main`
-  display: flex;
-  width: 100%;
-  height: 100%;
-  background-color: #4282a5;
-
-  a {
-    text-decoration: none;
-  }
-`;
-
 export const Img = styled.img`
   width: 47px;
 `;
@@ -57,5 +46,37 @@ export const ContentDiv = styled.div`
   }
   p {
     color: rgba(255, 255, 255, 0.7);
+  }
+`;
+
+export const ButtonDiv = styled.div`
+  margin-top: 40px;
+`;
+
+export const Main = styled.main`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background-color: #4282a5;
+
+  @media (max-width: 439px) {
+    ${Title} {
+      font-size: 28px;
+    }
+    ${ContentDiv} {
+      font-size: 0.9em;
+    }
+  }
+  @media (max-width: 394px) {
+    ${Title} {
+      font-size: 23px;
+    }
+    ${Img} {
+      width: 35px;
+    }
+  }
+
+  a {
+    text-decoration: none;
   }
 `;
