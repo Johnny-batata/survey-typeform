@@ -1,63 +1,95 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable no-sequences */
 /* eslint-disable no-param-reassign */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { ref, get, child } from "firebase/database";
+import MyResponsivePie from "./component/PieGraph/PieGraph";
+import Header from "../GeneralComponents/Header/Header";
+import MyResponsiveBar from "./component/BarGraph/BarGraph";
+import apiData from "../../data";
+import Context from "../../Provider/Context";
+import ButtonsNav from "../Form/component/ButtonsNav/ButtonsNav";
 
 import db from "../../utils/firebase";
 
 const Graph = () => {
-  const [firstData, setFirstData] = useState([]);
-  const [secondData, setSecondData] = useState([]);
+  const [allAnswers, setAllAnswers] = useState([]);
+  // const [currentGraph, setCurrentGraph] = useState(1);
+  const { setCurrentQuestion, currentQuestion } = useContext(Context);
 
-  const filterAnswers = (items) => {
-    const result = [];
+  const GroupAnswers = (items) => {
+    // this functions get all answers from db by params and group them by question(using it's id) then remove duplicates adding object's value that's supose to be duplicated on one
     const data = [];
     items
       .map(({ answers }) => answers)
-      .map((e) =>
-        e.map((el) => {
+      .forEach((e) =>
+        e.forEach((el) => {
           const arr = {
             id: el.value,
-            label: el.id,
+            label: el.value,
             color: "hsl(25, 70%, 50%)",
             value: 1,
+            question: el.id,
           };
+          const questionIndex = apiData.findIndex(
+            (question) => question.id === el.id
+          );
+          const repeatedOptionsQuestionIDIndex = data.findIndex(
+            (item) => item[el.id]
+          );
 
-          data.push(arr);
-          return result;
+          if (apiData[questionIndex].type === "options") {
+            if (repeatedOptionsQuestionIDIndex >= 0) {
+              // this if check question id existence, if's not then create a new one
+              const elementIndex = data[repeatedOptionsQuestionIDIndex][
+                el.id
+              ].findIndex((itemI) => itemI.id === el.value);
+
+              if (elementIndex >= 0) {
+                // this if checks if that answer already exists, if already exists then increases value on one
+                return (data[repeatedOptionsQuestionIDIndex][el.id][
+                  elementIndex
+                ].value += 1);
+              }
+              // if that answer doesn't exist it's created bellow
+              return data[repeatedOptionsQuestionIDIndex][el.id].push(arr);
+            }
+            // if the question id doesn't exist its create bellow
+            return data.push({ [el.id]: [arr] });
+          }
+
+          const repeatedRatingQuestionIDIndex = data.findIndex((item) => {
+            return item[el.id];
+          });
+          if (repeatedRatingQuestionIDIndex >= 0) {
+            // this if check question id existence, if's not then create a new one
+
+            const elementIndex = data[repeatedOptionsQuestionIDIndex][
+              el.id
+            ].findIndex((itemI) => {
+              return itemI.id === el.value;
+            });
+            if (elementIndex >= 0) {
+              // this if checks if that answer already exists, if already exists then increases value on one
+
+              data[repeatedOptionsQuestionIDIndex][el.id][elementIndex][
+                el.value
+              ] += 1;
+              return (data[repeatedOptionsQuestionIDIndex][el.id][
+                elementIndex
+              ].value += 1);
+            }
+            // if that answer doesn't exist it's created bellow
+            return data[repeatedOptionsQuestionIDIndex][el.id].push({
+              [el.value]: 1,
+              ...arr,
+            });
+          }
+
+          return data.push({ [el.id]: [{ [el.value]: 1, ...arr }] });
         })
       );
-    const pa = data.reduce((group, curP) => {
-      const newkey = curP.label;
-      if (!group[newkey]) {
-        group[newkey] = [];
-      }
-      group[newkey].push(curP);
-      return group;
-    }, {});
-    result.push(pa);
-    const keys = Object.keys(result[0]);
-    const batata1 = [];
-    const batata2 = [];
-    keys.map((el) => {
-      return result[0][el].map((e) => {
-        if (el === "1") {
-          const elementIndex = batata1.findIndex((item) => item.id === e.id);
-          if (elementIndex >= 0) {
-            return (batata1[elementIndex].value += 1);
-          }
-          return batata1.push(e);
-        }
-        const elementIndex = batata2.findIndex((item) => item.id === e.id);
-        if (elementIndex >= 0) {
-          return (batata2[elementIndex].value += 1);
-        }
-        return batata2.push(e);
-      });
-    });
-    setFirstData(batata1);
-    setSecondData(batata2);
+    setAllAnswers(data);
   };
 
   const getAnswers = () => {
@@ -65,7 +97,7 @@ const Graph = () => {
     get(child(dbRef, "questions/"))
       .then((snapshot) => {
         if (snapshot.exists()) {
-          filterAnswers(Object.values(snapshot.val()));
+          GroupAnswers(Object.values(snapshot.val()));
         } else {
           console.log("No data available");
         }
@@ -76,12 +108,39 @@ const Graph = () => {
   };
 
   useEffect(() => {
+    setCurrentQuestion(0);
     getAnswers();
   }, []);
+  const checkLoading = () => {
+    if (allAnswers.length > 0) {
+      if (apiData[currentQuestion].type === "options") {
+        return (
+          <MyResponsivePie
+            data={allAnswers[currentQuestion][apiData[currentQuestion].id]}
+          />
+        );
+      }
+      if (apiData[currentQuestion].type === "rating") {
+        return (
+          <MyResponsiveBar
+            data={allAnswers[currentQuestion][apiData[currentQuestion].id]}
+            questionKeys={allAnswers[currentQuestion][
+              apiData[currentQuestion].id
+            ].map((e) => e.label)}
+          />
+        );
+      }
+    }
+    return false;
+  };
   return (
-    <div>
-      <p>fim</p>
-      {console.log("a data ta aq", firstData, secondData)}
+    <div style={{ height: "400px" }}>
+      <Header />
+      <h1 style={{ display: "flex", justifyContent: "center" }}>
+        {apiData[currentQuestion].question}
+      </h1>
+      {checkLoading()}
+      <ButtonsNav />
     </div>
   );
 };

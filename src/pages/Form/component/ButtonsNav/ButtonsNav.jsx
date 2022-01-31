@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ButtonGroup from "@mui/material/ButtonGroup";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ref, push } from "firebase/database";
 import dateformat from "dateformat";
 import Context from "../../../../Provider/Context";
@@ -20,6 +20,8 @@ const ButtonsNav = () => {
     answers,
   } = useContext(Context);
   const navigate = useNavigate();
+  const location = useLocation();
+  const checkLocation = location.pathname.includes("result");
 
   const sendAnswers = (curr) => {
     try {
@@ -38,13 +40,23 @@ const ButtonsNav = () => {
     } catch (e) {
       console.log("Error adding document: ", e);
     }
-    // });
+  };
+
+  const handleAnswer = (curr) => {
+    const repeatedAnswerIndex = answers.findIndex((el) => el.id === curr.id);
+    if (repeatedAnswerIndex >= 0) {
+      const data = answers;
+      data[repeatedAnswerIndex].value = curr.value;
+
+      return setAnswers(data);
+    }
+    return setAnswers([...answers, curr]);
   };
 
   const handleClick = async () => {
     const { id } = questions[currentQuestion];
     const curr = { id, value };
-    setAnswers([...answers, curr]);
+    handleAnswer(curr);
 
     if (currentQuestion + 1 >= questions.length) {
       sendAnswers(curr);
@@ -73,7 +85,8 @@ const ButtonsNav = () => {
             backgroundColor: "#0067ac",
           }}
           size="large"
-          disabled
+          disabled={currentQuestion === 0}
+          onClick={() => setCurrentQuestion(currentQuestion - 1)}
         >
           <ArrowBackIcon />
         </Button>
@@ -84,7 +97,9 @@ const ButtonsNav = () => {
             backgroundColor: "#0067ac",
           }}
           size="large"
-          disabled={!value}
+          disabled={
+            !checkLocation ? !value : currentQuestion + 1 >= questions.length
+          }
           onClick={handleClick}
         >
           <ArrowForwardIcon />

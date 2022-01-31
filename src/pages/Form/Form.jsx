@@ -5,7 +5,7 @@ import RatingBar from "./component/RatingBar/RatingBar";
 import RatingOptions from "./component/RatingOptions/RatingOptions";
 import ButtonsNav from "./component/ButtonsNav/ButtonsNav";
 
-import Header from "./component/Header/Header";
+import Header from "../GeneralComponents/Header/Header";
 import * as S from "./styles";
 
 const Form = () => {
